@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Aluno {
-
+    // Encapsulamento
     private String nome;
     private List<Double> notas;
 
@@ -11,6 +11,7 @@ public class Aluno {
         this.notas = new ArrayList<>();
     }
 
+    // Adiciona Nota
     public void addNota(double nota){
         if(nota >= 0 && nota <= 10 ){
             this.notas.add(nota);
@@ -19,6 +20,7 @@ public class Aluno {
         }
     }
 
+    // Calcula a media
     public double calcMedia(){
         if(notas.isEmpty()){
             return 0.0;
@@ -30,6 +32,8 @@ public class Aluno {
         return soma / this.notas.size();
     }
 
+
+    // Verifica se foi aprovado ou nao aprovado
     public boolean verficarAprovacao(double mediaParaAprovar){
         double mediaFinal = calcMedia();
         return mediaFinal >= mediaParaAprovar;
@@ -39,5 +43,7 @@ public class Aluno {
         return this.nome;
     }
 
-
+    public List<Double> getNotas(){
+        return this.notas;
+    }
 }
