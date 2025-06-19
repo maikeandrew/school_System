@@ -23,19 +23,6 @@ public class Turma {
         return null; //Caso nao encontre
     }
 
-    /*
-    public void listarAlunos(){
-        System.out.println("--- Alunos da turma: " + nomeDaTurma + " ---");
-        for (Aluno aluno : alunos){
-            System.out.printf("Nome: %-20s | Notas: %.1f  | Media: %.1f | Sistuacao: %s\n",
-                    aluno.getNome(),
-                    aluno.calcMedia(),
-                    aluno.verficarAprovacao(7.0) ? "Aprovado" : "Reprovado"
-            );
-        }
-    }
-    */
-
     public void listarAlunos(){
         System.out.println("--- Relatorio da turma: " + nomeDaTurma + " ---");
         for (Aluno aluno : alunos){
