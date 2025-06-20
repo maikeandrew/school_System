@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Locale;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -37,7 +38,7 @@ public class SistemaEscolar {
                     lancarNotas(scanner);
                     break;
                 case 3:
-                    turma.listarAlunos();
+                    exibirRelatorioDaTurma();
                     break;
                 case 4:
                     salvarDados();
@@ -64,6 +65,7 @@ public class SistemaEscolar {
         System.out.println("Escolha uma opcao: ");
     }
 
+    //Cadastro de alunos
     private static void addAluno(Scanner scanner){
         System.out.print("Digite o nome do aluno(a) para lancar notas: ");
         String nome = scanner.nextLine();
@@ -72,6 +74,7 @@ public class SistemaEscolar {
         System.out.println("Aluno " + nome + " adicionado com sucesso!");
     }
 
+    //Lancamentos das notas e tratamento de erros
     private static void lancarNotas(Scanner scanner){
         System.out.print("Digite o nome do aluno para lancar notas: ");
         String nome = scanner.nextLine();
@@ -83,27 +86,35 @@ public class SistemaEscolar {
         }
 
         System.out.println("Digite as notas para " + aluno.getNome() + " (digite uma letra para parar).");
-        for (int i = 0; i < 3; i++){
+        for (int i = 0; i < 4; i++){
             System.out.print("Digite a " + (i + 1) + "ª nota: ");
             if (scanner.hasNextDouble()){
                 double nota = scanner.nextDouble();
-                aluno.addNota(nota);
+
+                if (aluno.addNota(nota)){
+                    System.out.println("... Nota lancada.");
+                } else {
+                    System.out.println("Erro: Nota inválida. A nota deve ser entre 0.0 e 10.0.");
+                    i--;
+                }
+
             } else {
+                System.out.println("Entrada inválida. Lançamento de notas interrompido.");
                 scanner.next();
                 break;
             }
         }
-
         scanner.next(); //Limpar buffer
         System.out.println("Notas lancadas com sucesso!");
     }
 
+    // Salvamento dos dados
     private static void salvarDados(){
         try (PrintWriter writer = new PrintWriter(new FileWriter(NOME_ARQUIVO))){
             for(Aluno aluno : turma.getAlunos()){
                 writer.print(aluno.getNome());
                 for (Double nota : aluno.getNotas()){
-                    writer.print("," + nota);
+                    writer.print(";" + nota);
                 }
                 writer.println();
             }
@@ -113,12 +124,13 @@ public class SistemaEscolar {
         }
     }
 
+    //Processo de carregar os dados
     private static void carregarDados(){
         try (BufferedReader reader = new BufferedReader(new FileReader(NOME_ARQUIVO))){
             String linha;
             turma = new Turma ("5º Ano B");
             while ((linha = reader.readLine()) != null){
-                String[] dados = linha.split(",");
+                String[] dados = linha.split(";");
                 Aluno aluno = new Aluno(dados[0]);
                 for (int i = 1; i < dados.length; i++){
                     aluno.addNota(Double.parseDouble(dados[i]));
@@ -132,4 +144,39 @@ public class SistemaEscolar {
             System.out.println("Erro ao carregar os dados: " + e.getMessage());
         }
     }
+
+    // Imprimor na tela o relatorio
+    private static void exibirRelatorioDaTurma(){
+        final double MEDIA_PARA_APROVACAO = 7.0;
+
+        System.out.println("\n--- Relatorio da Turma:" + turma.getNomeDaTurma() + " ---\n");
+
+        List<Aluno> alunos = turma.getAlunos();
+
+        if (alunos.isEmpty()) {
+            System.out.println("A turma ainda nao possui alunos cadastrados.");
+            return;
+        }
+
+        for (Aluno aluno : alunos){
+            System.out.printf("Nome: %-20s | Notas: ", aluno.getNome());
+            List<Double> notas = aluno.getNotas();
+
+            if (notas.isEmpty()){
+                System.out.print("[Nenhuma nota lancada]");
+            } else {
+                for (double nota : notas){
+                    System.out.printf("%.1f ", nota);
+                }
+            }
+
+            String situacao = aluno.verficarAprovacao(MEDIA_PARA_APROVACAO) ? "Aprovado" : "Nao Aprovado";
+
+            System.out.printf(" | Media: %.1f | Situacao: %s\n",
+                    aluno.calcMedia(),
+                    situacao);
+        }
+        System.out.println("--- Fim do Relatorio ---\n");
+    }
+
 }

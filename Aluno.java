@@ -12,11 +12,12 @@ public class Aluno {
     }
 
     // Adiciona Nota
-    public void addNota(double nota){
+    public boolean addNota(double nota){
         if(nota >= 0 && nota <= 10 ){
             this.notas.add(nota);
+            return true;
         }else{
-            System.out.println("Nota invalida. Insira um valor entre 0 e 10.");
+            return false;
         }
     }
 
