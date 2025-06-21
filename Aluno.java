@@ -4,47 +4,40 @@ import java.util.List;
 public class Aluno {
     // Encapsulamento
     private String nome;
-    private List<Double> notas;
+    private List<Disciplina> disciplinas;
 
-    public Aluno(String nome){
+    public Aluno(String nome) {
         this.nome = nome;
-        this.notas = new ArrayList<>();
+        this.disciplinas = new ArrayList<>();
     }
 
-    // Adiciona Nota
-    public boolean addNota(double nota){
-        if(nota >= 0 && nota <= 10 ){
-            this.notas.add(nota);
-            return true;
-        }else{
-            return false;
+    // Adicionar diciplina para o aluno
+    public void addDisciplina(Disciplina disciplina) {
+        this.disciplinas.add(disciplina);
+    }
+
+    //Buscar a disciplina pelo nome
+    public Disciplina buscarDisciplina(String nome) {
+        for (Disciplina disciplina : this.disciplinas) {
+            if (disciplina.getNome().equalsIgnoreCase(nome)) {
+                return disciplina;
+            }
         }
-    }
-
-    // Calcula a media
-    public double calcMedia(){
-        if(notas.isEmpty()){
-            return 0.0;
-        }
-        double soma = 0.0;
-        for (double nota : this.notas){
-            soma += nota;
-        }
-        return soma / this.notas.size();
+        return null;
     }
 
 
-    // Verifica se foi aprovado ou nao aprovado
-    public boolean verficarAprovacao(double mediaParaAprovar){
-        double mediaFinal = calcMedia();
-        return mediaFinal >= mediaParaAprovar;
-    }
-
-    public String getNome(){
+    //getters
+    public String getNome() {
         return this.nome;
     }
 
-    public List<Double> getNotas(){
-        return this.notas;
+    public List<Disciplina> getDisciplinas() {
+        return this.disciplinas;
     }
+
+    public void setNome(String novoNome) {
+        this.nome = novoNome;
+    }
+
 }
