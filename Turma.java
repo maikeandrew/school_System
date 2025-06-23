@@ -4,7 +4,6 @@ import java.util.List;
 public class Turma {
     private String nomeDaTurma;
     private List<Aluno> alunos;
-    private static final double MEDIA_PARA_APROVACAO = 7.0;
     private List<String> nomesDisciplinas;
 
     public Turma(String nomeDaTurma) {

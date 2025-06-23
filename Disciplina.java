@@ -51,7 +51,7 @@ public class Disciplina {
         for (double nota : this.notas) {
             soma += nota;
         }
-        return soma / this.notas.size();
+        return soma / 4; //Calculo da media
     }
 
     // verificar se o aluno estar aprovado na materia
@@ -67,6 +67,4 @@ public class Disciplina {
     public List<Double> getNotas() {
         return notas;
     }
-
-
 }
