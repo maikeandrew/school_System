@@ -1,7 +1,10 @@
 import java.io.*;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 
 public class SistemaEscolar {
@@ -10,65 +13,51 @@ public class SistemaEscolar {
     private static final String NOME_ARQUIVO = "testando.csv";
     private static Turma turma = new Turma("Turma teste");
 
+    private static final Map<Integer, Consumer<Scanner>> ACOES_DO_MENU = new HashMap<>();
+
     public static void main(String[] args) {
-        Locale.setDefault(new Locale("pt", "BR"));
+        Locale.setDefault(Locale.US);
         Scanner scanner = new Scanner(System.in);
 
-
-        // Carregamento dos dados salvos
+        configurarAcoes();
         carregarDados();
 
         int opcao = -1;
         while (opcao != 0) {
             exibirMenu();
-            if (scanner.hasNextInt()) {
-                opcao = scanner.nextInt();
-                scanner.nextLine();
-            } else {
-                System.out.println("Opcao invalida. Por favor, digite um numero.");
-                scanner.next();
+
+            try {
+                opcao = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Opção inválida. Por favor, digite um número.");
                 continue;
             }
+            Consumer<Scanner> acao = ACOES_DO_MENU.getOrDefault(opcao, SistemaEscolar::acaoInvalida);
+            acao.accept(scanner);
 
-            switch (opcao) {
-                case 1:
-                    addAluno(scanner);
-                    break;
-                case 2:
-                    cadastrarDisciplina(scanner);
-                    break;
-                case 3:
-                    lancarNotas(scanner);
-                    break;
-                case 4:
-                    editarNomeAluno(scanner);
-                    break;
-                case 5:
-                    exibirRelatorioDaTurma();
-                    break;
-                case 6:
-                    salvarDados();
-                    break;
-                case 7:
-                    excluirAluno(scanner);
-                    break;
-                case 8:
-                    gerenciarNotas(scanner);
-                    break;
-                case 0:
-                    System.out.println("Salvando dados antes de sair...");
-                    salvarDados();
-                    System.out.println("Programa finalizado.");
-                    break;
-                default:
-                    System.out.println("Opcao invalida. Tente novamente.");
-            }
+            if (opcao == 0){ break; }
         }
         scanner.close();
     }
 
-    // Menu
-    private static void exibirMenu() {
+    private static void configurarAcoes(){
+        ACOES_DO_MENU.put(1, SistemaEscolar::addAluno);
+        ACOES_DO_MENU.put(2, SistemaEscolar::cadastrarDisciplina);
+        ACOES_DO_MENU.put(3, SistemaEscolar::lancarNotas);
+        ACOES_DO_MENU.put(4, SistemaEscolar::editarNomeAluno);
+        ACOES_DO_MENU.put(5, SistemaEscolar::exibirRelatorioDaTurma);
+        ACOES_DO_MENU.put(6, SistemaEscolar::salvarDados);
+        ACOES_DO_MENU.put(7, SistemaEscolar::excluirAluno);
+        ACOES_DO_MENU.put(8, SistemaEscolar::gerenciarNotas);
+
+        ACOES_DO_MENU.put(0, scanner -> { //Acao de sair
+            System.out.println("Salvando dados antes de sair...");
+            salvarDados(scanner);
+            System.out.println("Programa finalizado.");
+        });
+    }
+
+    private static void exibirMenu(){
         System.out.println("\n--- Sistema de Gestao de Turmas ---");
         System.out.println("1. Adicionar Aluno");
         System.out.println("2. Cadastrar Discilpina");
@@ -81,6 +70,13 @@ public class SistemaEscolar {
         System.out.println("0. Sair");
         System.out.println("Escolha uma opcao: ");
     }
+
+    private static void acaoInvalida(Scanner scanner){
+        System.out.println("Opção inválida. Tente novamente.");
+    }
+
+//---------------------------------------------------------------------------------------------------------------------
+
 
     //Cadastro de alunos
     private static void addAluno(Scanner scanner) {
@@ -115,9 +111,7 @@ public class SistemaEscolar {
         alunoParaEditar.setNome(novoNome);
 
         System.out.println("Nome do aluno alterado com sucesso!");
-
     }
-
 
     //Excluir Aluno
     private static void excluirAluno(Scanner scanner) {
@@ -153,7 +147,7 @@ public class SistemaEscolar {
         System.out.println("Disciplina '" + nomeDisciplina + "' cadastrada no curriculo da turma.");
     }
 
-    //Lancamentos das notas e tratamento de erros
+//<============= Lancamentos das notas ================================================================================
     private static void lancarNotas(Scanner scanner) {
         System.out.print("Digite o nome do aluno para lancar notas: ");
         String nome = scanner.nextLine();
@@ -164,130 +158,153 @@ public class SistemaEscolar {
             return;
         }
 
-        List<Disciplina> disciplinasDoAluno = aluno.getDisciplinas();
-        if (disciplinasDoAluno.isEmpty()) {
-            System.out.println("Este aluno não está matriculado em nenhuma disciplina.");
-            //System.out.println("Primeiro, cadastre disciplinas na turma e adicione o aluno novamente.");
-            return;
-        }
+        Disciplina disciplina = selecionarDisciplinaDoAluno(scanner, aluno);
+        if (disciplina == null) return;
 
-        System.out.println("selecione a disciplina para lancar a nota:");
-        for (int i = 0; i < disciplinasDoAluno.size(); i++) {
-            System.out.println((i + 1) + ". " + disciplinasDoAluno.get(i).getNome());
-        }
-        System.out.print("Opcao: ");
-        int opcaoDisciplina = scanner.nextInt();
-        scanner.nextLine(); //Limpar buffer
+        System.out.print("Digite a nota para " + disciplina.getNome() + ": ");
+        String notaStr = scanner.nextLine().replace(',', '.');
 
-        if (opcaoDisciplina < 1 || opcaoDisciplina > disciplinasDoAluno.size()) {
-            System.out.println("Opcao de disciplina invalida.");
-            return;
-        }
-
-        Disciplina disciplinaSelecionada = disciplinasDoAluno.get(opcaoDisciplina - 1);
-
-        System.out.print("Digite a nota para " + disciplinaSelecionada.getNome() + ": ");
-        if (scanner.hasNextInt()) {
-            double nota = scanner.nextDouble();
-            scanner.nextLine();
-
-            if (disciplinaSelecionada.addNota(nota)) {
+        try{
+            double nota = Double.parseDouble(notaStr);
+            if (disciplina.addNota(nota)){
                 System.out.println("Nota lancada com sucesso!");
             } else {
                 System.out.println("Erro: Nota inválida. A nota deve ser entre 0.0 e 10.0.");
             }
-        } else {
-            System.out.println("Entrada inválida. Por favor, digite um número para a nota.");
-            scanner.nextLine();
+        } catch (NumberFormatException e){
+            System.out.println("Entrada inválida. Por favor, digite um número válido para a nota.");
         }
     }
+//====================================================================================================================>
 
-    //Gerenciamento das Notas dos alunos
+//<============== Gerenciamento das Notas dos alunos ==================================================================
     private static void gerenciarNotas(Scanner scanner) {
-        // -> Encontrar Aluno
+        Aluno aluno = encontrarAlunoParaGerenciamento(scanner); // -> Encontrar Aluno
+        if (aluno == null) return;
+
+        Disciplina disciplina = selecionarDisciplinaDoAluno(scanner, aluno);// -> Encontrar a Disciplina
+        if (disciplina == null) return;
+
+        executarAcaoDeNota(scanner, aluno, disciplina);
+    }
+
+    private static Aluno encontrarAlunoParaGerenciamento(Scanner scanner){
         System.out.print("Digite o nome do aluno para gerenciar as notas: ");
         String nomeAluno = scanner.nextLine();
         Aluno aluno = turma.buscarAluno(nomeAluno);
         if (aluno == null) {
-            System.out.println("Erro: Aluno nao encontrado.");
-            return;
+            System.out.println("Erro: Aluno não encontrado.");
+            return null;
+        }
+        return aluno;
+    }
+
+    // Seleciona as disciplinas
+    private static Disciplina selecionarDisciplinaDoAluno(Scanner scanner, Aluno aluno){
+        if (aluno.getDisciplinas().isEmpty()){
+            System.out.println("Este aluno não está matriculado em nenhuma disciplina.");
+            return null;
         }
 
-        // -> Encontrar a Disciplina
-        if (aluno.getDisciplinas().isEmpty()) {
-            System.out.println("Este aluno nao esta matriculado em nenhuma disciplina.");
-            return;
-        }
-        System.out.println("Selecione a disciplina para gerenciar as notas: ");
+        System.out.println("Selecione a disciplina para gerenciar as notas:");
         List<Disciplina> disciplinas = aluno.getDisciplinas();
-        for (int i = 0; i < disciplinas.size(); i++) {
+        for (int i = 0; i < disciplinas.size(); i++){
             System.out.println((i + 1) + ". " + disciplinas.get(i).getNome());
         }
-        System.out.print("Opcao: ");
+
+        System.out.print("Opção: ");
         int opcaoDisciplina = scanner.nextInt();
         scanner.nextLine();
-        if (opcaoDisciplina < 1 || opcaoDisciplina > disciplinas.size()) {
-            System.out.println("Opcao de disciplina invalida.");
+
+        if (opcaoDisciplina < 1 || opcaoDisciplina > disciplinas.size()){
+            System.out.println("Opção de disciplina inválida.");
+            return null;
+        }
+        return disciplinas.get(opcaoDisciplina - 1);
+    }
+
+    // Gerencia a execucao das acoes sobre as notas (Menu)
+    private static void executarAcaoDeNota(Scanner scanner, Aluno aluno, Disciplina disciplina){
+        System.out.println("\nNotas atuais de " + aluno.getNome() + " em " + disciplina.getNome() + ":");
+        List<Double> notas = disciplina.getNotas();
+        if (notas.isEmpty()){
+            System.out.println("[Nenhuma nota lançada para esta disciplina]");
             return;
         }
-
-        Disciplina disciplinaSelecionada = disciplinas.get(opcaoDisciplina - 1);
-
-        // -> Exibir as notas, Sub Menu
-        System.out.println("\nNotas atuais de " + aluno.getNome() + " em " + disciplinaSelecionada.getNome() + ":");
-        List<Double> notas = disciplinaSelecionada.getNotas();
-        if (notas.isEmpty()) {
-            System.out.println("[Nenhuma nota lancada para esta disciplina]");
-            return;
-        }
-        for (int i = 0; i < notas.size(); i++) {
+        for (int i =0; i < notas.size(); i++){
             System.out.println("  " + (i + 1) + ": " + notas.get(i));
         }
 
-        System.out.println("\nO que voce deseja fazer?");
+        System.out.println("\nO que você deseja fazer?");
         System.out.println("1. Alterar uma nota");
         System.out.println("2. Remover uma nota");
         System.out.println("0. Voltar ao menu principal");
-        System.out.println("Opcao: ");
-        int opcaoAco = scanner.nextInt();
+        System.out.println("Opção: ");
+        int opcaoAcao = scanner.nextInt();
         scanner.nextLine();
 
-        switch (opcaoAco) {
-            case 1: //Para alterar a nota
-                System.out.print("Qual o numero da nota que deseja alterar? ");
-                int indiceAlterar = scanner.nextInt() - 1;
-                System.out.print("Digite a nova nota: ");
-                double novaNota = scanner.nextDouble();
-                scanner.nextLine();
-
-                if (disciplinaSelecionada.alterarNota(indiceAlterar, novaNota)) {
-                    System.out.println("Nota alterada com sucesso!");
-                } else {
-                    System.out.println("Nao foi possivel alterar a nota. Verifique novamente se nota e valor sao validos");
-                }
+        switch (opcaoAcao){
+            case 1:
+                executarAlteracaoDeNota(scanner, disciplina);
                 break;
             case 2:
-                // -> Para remover a nota
-                System.out.println("Qual o numero da nota que deseja remover? ");
-                int indiceRemover = scanner.nextInt() - 1;
-                scanner.nextLine();
-
-                if (disciplinaSelecionada.removerNota(indiceRemover)) {
-                    System.out.println("Nota removida com sucesso!");
-                } else {
-                    System.out.println("Nao foi possivel remover a nota. Verifique se a nota e valor sao validos");
-                }
+                executarRemocaoDeNota(scanner, disciplina);
                 break;
             case 0:
                 break;
             default:
-                System.out.println("Opcao invalida.");
+                System.out.println("Opção inválida.");
         }
     }
 
+    // Alteracao das notas
+    private static void executarAlteracaoDeNota(Scanner scanner, Disciplina disciplina){
+        System.out.print("De qual bimestre que deseja alterar a nota? ");
+        int indiceAlterar;
+        try{
+            indiceAlterar = Integer.parseInt(scanner.nextLine()) - 1;
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Por favor, digite um número.");
+            return;
+        }
+
+        System.out.print("Digite a nova nota: ");
+        String notaStr = scanner.nextLine().replace(',', '.');
+        try {
+            double novaNota = Double.parseDouble(notaStr);
+            if (disciplina.alterarNota(indiceAlterar, novaNota)){
+                System.out.println("Nota alterada com sucesso!");
+            } else {
+                System.out.println("Não foi possível alterar a nota. Verifique se o número da nota e o valor são válidos.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Por favor, digite um número válido para a nota.");
+        }
+    }
+
+    // Remocao das Notas
+    private static void executarRemocaoDeNota(Scanner scanner, Disciplina disciplina){
+        System.out.print("Qual o número da nota que deseja remover? ");
+        int indiceRemover;
+        try {
+            indiceRemover = Integer.parseInt(scanner.nextLine()) - 1;
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Por favor, digite um número.");
+            return;
+        }
+
+        if (disciplina.removerNota(indiceRemover)){
+            System.out.println("Nota removida com sucesso!");
+        } else {
+            System.out.println("Não foi possível remover a nota. Verifique se o número da nota é válido.");
+        }
+    }
+// ====================================================================================================================>
+
 
     // Salvamento dos dados
-    private static void salvarDados() {
+    private static void salvarDados(Scanner scanner) {
+
         try (PrintWriter writer = new PrintWriter(new FileWriter(NOME_ARQUIVO))) {
             for (Aluno aluno : turma.getAlunos()) {
                 StringBuilder linha = new StringBuilder();
@@ -345,7 +362,7 @@ public class SistemaEscolar {
     }
 
     // Exibe o relatorio da turma
-    private static void exibirRelatorioDaTurma() {
+    private static void exibirRelatorioDaTurma(Scanner scanner) {
         final double MEDIA_PARA_APROVACAO = 6.0;
 
         System.out.println("\n--- Relatorio da Turma:" + turma.getNomeDaTurma() + " ---\n");
@@ -358,9 +375,9 @@ public class SistemaEscolar {
         }
 
         for (Aluno aluno : alunos) {
-            System.out.printf("\n========================================");
+            System.out.println("========================================");
             System.out.printf("Aluno: " + aluno.getNome());
-            System.out.printf("----------------------------------------");
+            System.out.println("----------------------------------------");
 
             List<Disciplina> disciplinas = aluno.getDisciplinas();
             if (disciplinas.isEmpty()) {
