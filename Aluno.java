@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Aluno {
     // Encapsulamento
@@ -27,7 +28,7 @@ public class Aluno {
     }
 
 
-    //getters
+    //getters e Setters
     public String getNome() {
         return this.nome;
     }
@@ -38,6 +39,19 @@ public class Aluno {
 
     public void setNome(String novoNome) {
         this.nome = novoNome;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Aluno aluno = (Aluno) o;
+        return Objects.equals(nome.toLowerCase(), aluno.nome.toLowerCase());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome.toLowerCase());
     }
 
 }
