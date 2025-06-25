@@ -10,14 +10,13 @@ public class ConsoleView {
     }
 
     public void exibirMenu() {
-        System.out.println("\n--- Sistema de Gestao de Turmas ---");
+        System.out.println("\n--- Sistema de Gestao Escolar ---");
         System.out.println("1. Adicionar Aluno");
         System.out.println("2. Cadastrar Disciplina");
-        System.out.println("3. Lancar Nota para um Aluno");
-        System.out.println("4. Editar Nome de Aluno");
-        System.out.println("5. Excluir Aluno");
-        System.out.println("6. Gerenciar Notas de Aluno");
-        System.out.println("7. Exibir Relatório da Turma");
+        System.out.println("3. Lançar Nota (Trabalho/Prova)");
+        System.out.println("4. Exibir Relatório Detalhado da Turma");
+        System.out.println("5. Editar Nome de Aluno");
+        System.out.println("6. Excluir Aluno");
         System.out.println("0. Sair");
     }
 
@@ -30,30 +29,45 @@ public class ConsoleView {
         }
     }
 
+    public int selecionarBimestre() {
+        System.out.println("Para qual bimestre deseja lançar a nota?");
+        System.out.println("1. 1º Bimestre");
+        System.out.println("2. 2º Bimestre");
+        System.out.println("3. 3º Bimestre");
+        System.out.println("4. 4º Bimestre");
+        return obterOpcaoDoMenu();
+    }
+
+    public int selecionarTipoDeNota() {
+        System.out.println("Qual o tipo de nota?");
+        System.out.println("1. Nota de Trabalho (pode adicionar várias)");
+        System.out.println("2. Nota da Prova (substitui a anterior, se houver)");
+        return obterOpcaoDoMenu();
+    }
+
     public String obterEntradaDoUsuario(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
     }
 
-    public double obterNota() {
+    public double obterNota(String tipo) {
         while (true) {
-            System.out.print("Digite a nota: ");
+            System.out.print("Digite a nota: " + tipo + ": ");
             String notaStr = scanner.nextLine().replace(',', '.');
             try {
-                return Double.parseDouble(notaStr);
+                double nota = Double.parseDouble(notaStr);
+                if (nota >= 0 && nota <= 10) {
+                    return nota;
+                } else {
+                    exibirMensagemDeErro("A nota deve ser entre 0.0 e 10.0.");
+                }
             } catch (NumberFormatException e) {
                 exibirMensagemDeErro("Entrada inválida. Por favor, digite um número.");
             }
         }
     }
 
-    public boolean confirmarAcao(String mensagemDeConfirmacao) {
-        System.out.print(mensagemDeConfirmacao + " (S/N): ");
-        String confirmacao = scanner.nextLine();
-        return confirmacao.equalsIgnoreCase("S");
-    }
-
-    // Selecao de disciplina --------------------------------------------------
+    // Selecao de disciplina
     public Disciplina selecionarDisciplina(List<Disciplina> disciplinas) {
         if (disciplinas.isEmpty()) {
             exibirMensagem("Este aluno não está matriculado em nenhuma disciplina.");
@@ -79,83 +93,9 @@ public class ConsoleView {
         }
     }
 
-    // Exibe o relatorio da turma ----------------------------------------------------------------------
-    public void exibirRelatorioDaTurma(Turma turma) {
-        final double MEDIA_PARA_APROVACAO = 6.0;
-
-        System.out.println("\n--- Relatorio da Turma: " + turma.getNomeDaTurma() + " ---");
-        List<Aluno> alunos = turma.getAlunos();
-        if (alunos.isEmpty()) {
-            System.out.println("A turma ainda nao possui alunos cadastrados.");
-            return;
-        }
-
-        for (Aluno aluno : alunos) {
-            System.out.println("========================================");
-            System.out.printf("Aluno: %s\n", aluno.getNome());
-            System.out.println("----------------------------------------");
-            List<Disciplina> disciplinas = aluno.getDisciplinas();
-            if (disciplinas.isEmpty()) {
-                System.out.println("  [Nenhuma disciplina matriculada]");
-            } else {
-                for (Disciplina disciplina : disciplinas) {
-                    System.out.print(formatarLinhaDisciplina(disciplina, MEDIA_PARA_APROVACAO));
-                }
-            }
-        }
-        System.out.println("========================================");
-        System.out.println("--- Fim do Relatório ---");
-    }
-
-    private String formatarLinhaDisciplina(Disciplina disciplina, double mediaParaAprovar) {
-        String nomeDisciplina = disciplina.getNome();
-        List<Double> notas = disciplina.getNotas();
-        double media = disciplina.calcMedia();
-        String situacao = disciplina.verificarAprovacao(mediaParaAprovar) ? "Aprovado" : "Reprovado";
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("  -> Disciplina: %-15s | Notas: ", nomeDisciplina));
-
-        if (notas.isEmpty()) {
-            sb.append("[Nenhuma nota lançada]");
-        } else {
-            for (int i = 0; i < notas.size(); i++) {
-                sb.append(String.format("%.1f", notas.get(i)));
-                if (i < notas.size() - 1) {
-                    sb.append(" : ");
-                }
-            }
-        }
-        sb.append(String.format(" | Media: %.1f | Situacao: %s\n", media, situacao));
-        return sb.toString();
-    }
-
-    // Gerencia acoes sobre as notas (Notas ja lancadas) --------------------------------------------------
-    public int obterAcaoParaNota(Aluno aluno, Disciplina disciplina) {
-        System.out.println("\nNotas atuais de " + aluno.getNome() + " em " + disciplina.getNome() + ":");
-        List<Double> notas = disciplina.getNotas();
-
-        if (notas.isEmpty()) {
-            exibirMensagem("[Nenhuma nota lançada para esta disciplina]");
-            return 0;
-        }
-        for (int i = 0; i < notas.size(); i++) {
-            System.out.println("  " + (i + 1) + ": " + notas.get(i));
-        }
-        System.out.println("\nO que você deseja fazer?");
-        System.out.println("1. Alterar uma nota");
-        System.out.println("2. Remover uma nota");
-        System.out.println("0. Voltar ao menu principal");
-        return obterOpcaoDoMenu();
-    }
-
-    public int obterIndiceNota() {
-        System.out.print("Qual o número da nota? ");
-        try {
-            return Integer.parseInt(scanner.nextLine()) - 1;
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+    public boolean confirmarAcao(String mensagemDeConfirmacao) {
+        System.out.print(mensagemDeConfirmacao + " (S/N): ");
+        return scanner.nextLine().equalsIgnoreCase("S");
     }
 
     public void exibirMensagem(String mensagem) {
@@ -164,6 +104,66 @@ public class ConsoleView {
 
     public void exibirMensagemDeErro(String erro) {
         System.out.println("Erro: " + erro);
+    }
+
+    // Exibe o relatorio da turma
+    public void exibirRelatorioDaTurma(Turma turma, double mediaAnualParaAprovacao, double mediaBimestreParaAprovacao) {
+
+        System.out.println("\n--- Relatório Detalhado da Turma: " + turma.getNomeDaTurma() + " ---");
+        List<Aluno> alunos = turma.getAlunos();
+        if (alunos.isEmpty()) {
+            exibirMensagem("A turma ainda não possui alunos cadastrados.");
+            return;
+        }
+
+        for (Aluno aluno : alunos) {
+            System.out.println("\n==========================================================================");
+            System.out.printf("Aluno: %s\n", aluno.getNome());
+
+            List<Disciplina> disciplinas = aluno.getDisciplinas();
+            if (disciplinas.isEmpty()) {
+                System.out.println("  [Nenhuma disciplina matriculada]");
+            } else {
+                for (Disciplina disciplina : disciplinas) {
+                    System.out.println("--------------------------------------------------------------------------");
+                    String situacaoFinal = disciplina.verificarAprovacaoFinal(mediaAnualParaAprovacao) ? "Aprovado" : "Reprovado";
+                    System.out.printf("  -> Disciplina: %s (Média Final Anual: %.1f) - Situação Final: %s\n",
+                            disciplina.getNome(),
+                            disciplina.calcularMediaFinalAnual(),
+                            situacaoFinal);
+                    System.out.println("..........................................................................");
+
+                    for (int i = 0; i < disciplina.getBimestres().size(); i++) {
+                        Bimestre bimestre = disciplina.getBimestres().get(i);
+                        String situacaoBimestre = bimestre.verificarAprovacaoBimestre(mediaBimestreParaAprovacao) ? "Ok" : "Recuperação";
+                        System.out.printf("     %dº Bimestre: [Trabalhos: %s (Média: %.1f)] [Prova: %.1f] -> Media: %.1f (%s)\n",
+                                (i + 1),
+                                formatarNotasTrabalho(bimestre.getNotasTrabalhos()),
+                                bimestre.calcularMediaTrabalhos(),
+                                bimestre.getNotaProva(),
+                                bimestre.calcularNotaBimestre(),
+                                situacaoBimestre
+                        );
+                    }
+                }
+            }
+        }
+        System.out.println("==========================================================================");
+        System.out.println("--- Fim do Relatório ---");
+    }
+
+    private String formatarNotasTrabalho(List<Double> notas) {
+        if (notas.isEmpty()) {
+            return "N/A";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < notas.size(); i++) {
+            sb.append(String.format("%.1f", notas.get(i)));
+            if (i < notas.size() - 1) {
+                sb.append(" + ");
+            }
+        }
+        return sb.toString();
     }
 
     public void fechar() {
