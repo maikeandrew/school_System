@@ -5,6 +5,8 @@ public class Turma {
     private String nomeDaTurma;
     private List<Aluno> alunos;
     private List<String> nomesDisciplinas;
+    private static final double MEDIA_PARA_APROVACAO = 7.0;
+    private static final double MEDIA_BIMESTRE_PARA_APROVACAO = 6.0;
 
     public Turma(String nomeDaTurma) {
         this.nomeDaTurma = nomeDaTurma;
@@ -60,6 +62,10 @@ public class Turma {
     }
 
     // getters
+    public double getMediaBimestreParaAprovacao(){
+        return MEDIA_BIMESTRE_PARA_APROVACAO;
+    }
+
     public List<Aluno> getAlunos() {
         return alunos;
     }
@@ -70,5 +76,9 @@ public class Turma {
 
     public List<String> getNomesDisciplinas() {
         return this.nomesDisciplinas;
+    }
+
+    public double getMediaParaAprovacao() {
+        return MEDIA_PARA_APROVACAO;
     }
 }

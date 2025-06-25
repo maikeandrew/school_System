@@ -3,68 +3,49 @@ import java.util.List;
 
 public class Disciplina {
 
-    private String nome;
-    private List<Double> notas;
+    private final String nome;
+    private final List<Bimestre> bimestres;
 
     public Disciplina(String nome) {
         this.nome = nome;
-        this.notas = new ArrayList<>();
-    }
-
-    // Adiciona uma nota a discipina separadamente
-    public boolean addNota(double nota) {
-        if (nota >= 0 && nota <= 10) {
-            this.notas.add(nota);
-            return true;
-        } else {
-            return false;
+        this.bimestres = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            this.bimestres.add(new Bimestre());
         }
     }
 
-    // Alterar as notas selecionadas dos alunos
-    public boolean alterarNota(int indiceNota, double novaNota) {
-        //Valida de o indice esta dentro dos limites 0 a 10
-        if (indiceNota >= 0 && indiceNota < this.notas.size() && novaNota >= 0 && novaNota <= 10) {
-            this.notas.set(indiceNota, novaNota);
-            return true;
+    public double calcularMediaFinalAnual() {
+        double somaDasNotasDosBimestres = 0.0;
+        for (Bimestre bimestre : this.bimestres) {
+            somaDasNotasDosBimestres += bimestre.calcularNotaBimestre();
         }
-        return false;
+        return somaDasNotasDosBimestres / 4.0;
     }
 
-    // Remove uma nota selecionada
-    public boolean removerNota(int indiceNota) {
-        // Validacao do indice
-        if (indiceNota >= 0 && indiceNota < this.notas.size()) {
-            this.notas.remove(indiceNota);
-            return true;
-        }
-        return false;
+    public boolean verificarAprovacaoFinal(double mediaParaAprovar) {
+        return calcularMediaFinalAnual() >= mediaParaAprovar;
     }
 
-
-    // Calcaula a media das notas para cada disciplina
-    public double calcMedia() {
-        if (notas.isEmpty()) {
-            return 0.0;
-        }
-        double soma = 0.0;
-        for (double nota : this.notas) {
-            soma += nota;
-        }
-        return soma / 4; //Calculo da media
-    }
-
-    // verificar se o aluno estar aprovado na materia
-    public boolean verificarAprovacao(double mediaParaAprovar) {
-        return calcMedia() >= mediaParaAprovar;
-    }
 
     // Getters
     public String getNome() {
         return nome;
     }
 
-    public List<Double> getNotas() {
-        return notas;
+    /**
+     * Retorna um objeto Bimestre específico.
+     *
+     * @param numeroBimestre O número do bimestre (de 1 a 4).
+     * @return O objeto Bimestre correspondente, ou null se o número for inválido.
+     */
+    public Bimestre getBimestre(int numeroBimestre) {
+        if (numeroBimestre >= 1 && numeroBimestre <= 4) {
+            return this.bimestres.get(numeroBimestre - 1);
+        }
+        return null;
+    }
+
+    public List<Bimestre> getBimestres() {
+        return bimestres;
     }
 }
