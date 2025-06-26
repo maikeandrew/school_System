@@ -1,3 +1,10 @@
+package com.gestaoescolar.view;
+
+import com.gestaoescolar.model.Aluno;
+import com.gestaoescolar.model.Bimestre;
+import com.gestaoescolar.model.Disciplina;
+import com.gestaoescolar.model.Turma;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,12 +18,12 @@ public class ConsoleView {
 
     public void exibirMenu() {
         System.out.println("\n--- Sistema de Gestao Escolar ---");
-        System.out.println("1. Adicionar Aluno");
-        System.out.println("2. Cadastrar Disciplina");
+        System.out.println("1. Adicionar com.gestaoescolar.model.Aluno");
+        System.out.println("2. Cadastrar com.gestaoescolar.model.Disciplina");
         System.out.println("3. Lançar Nota (Trabalho/Prova)");
-        System.out.println("4. Exibir Relatório Detalhado da Turma");
-        System.out.println("5. Editar Nome de Aluno");
-        System.out.println("6. Excluir Aluno");
+        System.out.println("4. Exibir Relatório Detalhado da com.gestaoescolar.model.Turma");
+        System.out.println("5. Editar Nome de com.gestaoescolar.model.Aluno");
+        System.out.println("6. Excluir com.gestaoescolar.model.Aluno");
         System.out.println("0. Sair");
     }
 
@@ -31,10 +38,10 @@ public class ConsoleView {
 
     public int selecionarBimestre() {
         System.out.println("Para qual bimestre deseja lançar a nota?");
-        System.out.println("1. 1º Bimestre");
-        System.out.println("2. 2º Bimestre");
-        System.out.println("3. 3º Bimestre");
-        System.out.println("4. 4º Bimestre");
+        System.out.println("1. 1º com.gestaoescolar.model.Bimestre");
+        System.out.println("2. 2º com.gestaoescolar.model.Bimestre");
+        System.out.println("3. 3º com.gestaoescolar.model.Bimestre");
+        System.out.println("4. 4º com.gestaoescolar.model.Bimestre");
         return obterOpcaoDoMenu();
     }
 
@@ -109,7 +116,7 @@ public class ConsoleView {
     // Exibe o relatorio da turma
     public void exibirRelatorioDaTurma(Turma turma, double mediaAnualParaAprovacao, double mediaBimestreParaAprovacao) {
 
-        System.out.println("\n--- Relatório Detalhado da Turma: " + turma.getNomeDaTurma() + " ---");
+        System.out.println("\n--- Relatório Detalhado da com.gestaoescolar.model.Turma: " + turma.getNomeDaTurma() + " ---");
         List<Aluno> alunos = turma.getAlunos();
         if (alunos.isEmpty()) {
             exibirMensagem("A turma ainda não possui alunos cadastrados.");
@@ -118,7 +125,7 @@ public class ConsoleView {
 
         for (Aluno aluno : alunos) {
             System.out.println("\n==========================================================================");
-            System.out.printf("Aluno: %s\n", aluno.getNome());
+            System.out.printf("com.gestaoescolar.model.Aluno: %s\n", aluno.getNome());
 
             List<Disciplina> disciplinas = aluno.getDisciplinas();
             if (disciplinas.isEmpty()) {
@@ -127,7 +134,7 @@ public class ConsoleView {
                 for (Disciplina disciplina : disciplinas) {
                     System.out.println("--------------------------------------------------------------------------");
                     String situacaoFinal = disciplina.verificarAprovacaoFinal(mediaAnualParaAprovacao) ? "Aprovado" : "Reprovado";
-                    System.out.printf("  -> Disciplina: %s (Média Final Anual: %.1f) - Situação Final: %s\n",
+                    System.out.printf("  -> com.gestaoescolar.model.Disciplina: %s (Média Final Anual: %.1f) - Situação Final: %s\n",
                             disciplina.getNome(),
                             disciplina.calcularMediaFinalAnual(),
                             situacaoFinal);
@@ -136,7 +143,7 @@ public class ConsoleView {
                     for (int i = 0; i < disciplina.getBimestres().size(); i++) {
                         Bimestre bimestre = disciplina.getBimestres().get(i);
                         String situacaoBimestre = bimestre.verificarAprovacaoBimestre(mediaBimestreParaAprovacao) ? "Ok" : "Recuperação";
-                        System.out.printf("     %dº Bimestre: [Trabalhos: %s (Média: %.1f)] [Prova: %.1f] -> Media: %.1f (%s)\n",
+                        System.out.printf("     %dº com.gestaoescolar.model.Bimestre: [Trabalhos: %s (Média: %.1f)] [Prova: %.1f] -> Media: %.1f (%s)\n",
                                 (i + 1),
                                 formatarNotasTrabalho(bimestre.getNotasTrabalhos()),
                                 bimestre.calcularMediaTrabalhos(),

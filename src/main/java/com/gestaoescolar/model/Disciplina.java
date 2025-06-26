@@ -1,3 +1,5 @@
+package com.gestaoescolar.model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +35,10 @@ public class Disciplina {
     }
 
     /**
-     * Retorna um objeto Bimestre específico.
+     * Retorna um objeto com.gestaoescolar.model.Bimestre específico.
      *
      * @param numeroBimestre O número do bimestre (de 1 a 4).
-     * @return O objeto Bimestre correspondente, ou null se o número for inválido.
+     * @return O objeto com.gestaoescolar.model.Bimestre correspondente, ou null se o número for inválido.
      */
     public Bimestre getBimestre(int numeroBimestre) {
         if (numeroBimestre >= 1 && numeroBimestre <= 4) {

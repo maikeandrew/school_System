@@ -1,3 +1,5 @@
+package com.gestaoescolar.model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class Turma {
         this.alunos.add(aluno);
     }
 
-    //Excluir Aluno
+    //Excluir com.gestaoescolar.model.Aluno
     public boolean removerAluno(String nome) {
         Aluno alunoParaRemover = this.buscarAluno(nome);
 

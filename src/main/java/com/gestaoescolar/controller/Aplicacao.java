@@ -1,3 +1,11 @@
+package com.gestaoescolar.controller;
+
+import com.gestaoescolar.model.Aluno;
+import com.gestaoescolar.model.Bimestre;
+import com.gestaoescolar.model.Disciplina;
+import com.gestaoescolar.model.Turma;
+import com.gestaoescolar.view.ConsoleView;
+
 import java.io.*;
 
 // Aqui esta todo o gerenciamento das aplicacoes do sistema
@@ -12,7 +20,7 @@ public class Aplicacao {
 
     public Aplicacao() {
         this.view = new ConsoleView();
-        this.turma = new Turma("Turma Tester");
+        this.turma = new Turma("com.gestaoescolar.model.Turma Tester");
         this.executando = true;
     }
 
@@ -60,7 +68,7 @@ public class Aplicacao {
         String nomeAluno = view.obterEntradaDoUsuario("Digite o nome do aluno: ");
         Aluno aluno = turma.buscarAluno(nomeAluno);
         if (aluno == null) {
-            view.exibirMensagemDeErro("Aluno não encontrado.");
+            view.exibirMensagemDeErro("com.gestaoescolar.model.Aluno não encontrado.");
             return;
         }
 
@@ -70,7 +78,7 @@ public class Aplicacao {
         int numBimestre = view.selecionarBimestre();
         Bimestre bimestre = disciplina.getBimestre(numBimestre);
         if (bimestre == null) {
-            view.exibirMensagemDeErro("Bimestre inválido.");
+            view.exibirMensagemDeErro("com.gestaoescolar.model.Bimestre inválido.");
             return;
         }
 
@@ -127,7 +135,7 @@ public class Aplicacao {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
             String linha;
-            this.turma = new Turma("Turma teste");
+            this.turma = new Turma("com.gestaoescolar.model.Turma teste");
 
             while ((linha = reader.readLine()) != null) {
                 if (linha.trim().isEmpty()) continue;
@@ -179,7 +187,7 @@ public class Aplicacao {
             return;
         }
         turma.addAluno(new Aluno(nome));
-        view.exibirMensagem("Aluno '" + nome + "' adicionado com sucesso!");
+        view.exibirMensagem("com.gestaoescolar.model.Aluno '" + nome + "' adicionado com sucesso!");
     }
 
     private void cadastrarDisciplina() {
@@ -189,15 +197,15 @@ public class Aplicacao {
             return;
         }
         turma.addDisciplinaAoCurriculo(nome);
-        view.exibirMensagem("Disciplina '" + nome + "' cadastrada no currículo da turma.");
+        view.exibirMensagem("com.gestaoescolar.model.Disciplina '" + nome + "' cadastrada no currículo da turma.");
     }
 
-    //Gerenciar dados/Alterar e remover (Aluno, Notas)
+    //Gerenciar dados/Alterar e remover (com.gestaoescolar.model.Aluno, Notas)
     private void editarNomeAluno() {
         String nomeAtual = view.obterEntradaDoUsuario("Digite o nome ATUAL do aluno: ");
         Aluno aluno = turma.buscarAluno(nomeAtual);
         if (aluno == null) {
-            view.exibirMensagemDeErro("Aluno não encontrado.");
+            view.exibirMensagemDeErro("com.gestaoescolar.model.Aluno não encontrado.");
             return;
         }
 
@@ -214,14 +222,14 @@ public class Aplicacao {
         String nome = view.obterEntradaDoUsuario("Digite o nome do aluno a ser excluído: ");
         Aluno aluno = turma.buscarAluno(nome);
         if (aluno == null) {
-            view.exibirMensagemDeErro("Aluno não encontrado.");
+            view.exibirMensagemDeErro("com.gestaoescolar.model.Aluno não encontrado.");
             return;
         }
 
         boolean confirmado = view.confirmarAcao("Tem certeza que deseja excluir o aluno '" + nome + "'? Esta ação não pode ser desfeita.");
         if (confirmado) {
             if (turma.removerAluno(nome)) {
-                view.exibirMensagem("Aluno removido com sucesso!");
+                view.exibirMensagem("com.gestaoescolar.model.Aluno removido com sucesso!");
             } else {
                 view.exibirMensagemDeErro("Falha ao remover o aluno.");
             }
